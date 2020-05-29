@@ -168,7 +168,14 @@ async def roll(ctx, number_of_dice: int, number_of_sides: int):
         str(random.choice(range(1, number_of_sides + 1)))
         for _ in range(number_of_dice)
     ]
-    await ctx.send(', '.join(dice))       
+    await ctx.send(', '.join(dice))    
+
+@bot.command(name='8ball', help='Ask a question, get an answer. Simple as that')
+async def eightball(ctx, question):
+    RESPONSES = ["Absolutely!", "Not at all!", "Never!", "You can count on it!", "Hell no!", "Yes", "No", "For sure!", "You know it, boss =)", "HELL no", "Not too sure about that one, boss", "Can't say for sure", "I wouldn't count on it", "Nope"]
+    if(question.strip() != ""):
+        await ctx.channel.send(RESPONSES[int(random.choice(range(0, len(RESPONSES))))])
+
 
 
 #Events

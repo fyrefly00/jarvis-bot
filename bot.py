@@ -79,16 +79,14 @@ async def pay(ctx, user , val : int):
     payer = str(ctx.author.id)
     c.execute('SELECT * FROM data WHERE name=? ', (str(ctx.author.id),))
     payer_data = c.fetchone()
-    if(val<=payer_data[1]):
+    if(val<=payer_data[1] and payer_data[1] > 0):
         payee =  bot.get_user(int(str(user)[3:len(user)-1]))
         payee_name = str(int(str(user)[3:len(user)-1]))
         c.execute('SELECT * FROM data WHERE name=? ', (payee_name,))
         if c:
             payee_data = c.fetchone()
-            new_balance= payee_data[1] + val
-            old_balance = payer_data[1] - val
-            c.execute("UPDATE data SET balance = ? WHERE name = ?", (new_balance , (payee_name)))
-            c.execute("UPDATE data SET balance = ? WHERE name = ?", (old_balance, (str(ctx.author.id))))
+            c.execute("UPDATE data SET balance = ? WHERE name = ?", (payee_data[1] + val, (str(payee.id))))
+            c.execute("UPDATE data SET balance = ? WHERE name = ?", ( payer_data[1] - val, (str(ctx.author.id))))
             conn.commit()
             c.execute('SELECT * FROM data WHERE name=? ', (payer,))
             payer_data = c.fetchone()

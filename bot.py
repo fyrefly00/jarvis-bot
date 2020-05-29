@@ -8,6 +8,8 @@ import random
 import time
 import sqlite3
 from discord.ext import commands
+from datetime import datetime
+from dateutil import parser
 
 #Weather API token
 TOKEN = "NzE0OTcwNzU2NjA1NTQyNDgx.Xs2egw.xjKqcAdP55okLQ7zm5nBGXMUzjY"
@@ -19,7 +21,8 @@ c = conn.cursor()
 
 #Uncomment to regen database
 # c.execute('''CREATE TABLE data 
-#                 (name text, balance real, vibes real)''')
+#                 (name text, balance real, vibes real, time blob)''')
+# conn.commit()
 
 
 # Bot commmands
@@ -39,9 +42,10 @@ async def helloworld(ctx):
 @bot.command(name='register', help='Registers account for lembas and vibes')
 async def register(ctx):
     name = str(ctx.author.id)
-    c.execute("INSERT INTO data VALUES (?,?,?)", (name, 10.0, 10.0))
+    now = datetime.now()
+    c.execute("INSERT INTO data VALUES (?,?,?,?)", (name, 10.0, 10.0, now))
     conn.commit()
-    await ctx.send(name + "'s account registered!")
+    await ctx.send(bot.get_user(ctx.author.id).name + "'s account registered!")
 
 
 #Currency
@@ -79,7 +83,7 @@ async def pay(ctx, user , val : int):
     payer = str(ctx.author.id)
     c.execute('SELECT * FROM data WHERE name=? ', (str(ctx.author.id),))
     payer_data = c.fetchone()
-    if(val<=payer_data[1] and payer_data[1] > 0):
+    if(val<=payer_data[1] and payer_data[1] > 0 and val >= 0):
         payee =  bot.get_user(int(str(user)[3:len(user)-1]))
         payee_name = str(int(str(user)[3:len(user)-1]))
         c.execute('SELECT * FROM data WHERE name=? ', (payee_name,))
@@ -141,6 +145,25 @@ async def wishingwell(ctx, value):
         await ctx.channel.send("You recieved " + str(winnings) + " vibes!")
     else:
         await ctx.channel.send("Insuffecient Lembas!")
+
+#Work function
+@bot.command(name = 'work', help="You can work once every hour to earn some Lembas")
+async def work(ctx):
+    now = datetime.now()
+    user = str(ctx.author.id)
+    c.execute('SELECT * FROM data WHERE name=? ', (user,))
+    user_data =c.fetchone()
+    last = parser.parse(user_data[3]) 
+    difference = now - last
+    if difference.total_seconds() / 3600 >= 1:
+        c.execute("UPDATE data SET balance = ? WHERE name = ?", (user_data[1] + 10.0, str(ctx.author.id)))
+        c.execute("UPDATE data SET time = ? WHERE name = ?", (now, str(ctx.author.id)))
+        conn.commit()
+        await ctx.channel.send("Added 10 Lembas to your account!")
+    else:
+        await ctx.channel.send("Too soon! Wait " + str(59 - int(divmod(difference.total_seconds(), 60)[0])) + " minutes and " + str(60 - round(divmod(difference.total_seconds(), 60)[1],2)) + " seconds")
+        
+
       
 
 #Fun / Utils
@@ -192,7 +215,7 @@ async def on_message(message):
     #Auto-register function (might be broken)
     c.execute("SELECT * FROM data WHERE name=?",(str(message.author.id),))
     if not c:
-        c.execute("INSERT INTO data VALUES (?,?,?)", (str(message.author.id), 0.0, 0.0))
+        c.execute("INSERT INTO data VALUES (?,?,?,?)", (str(message.author.id), 0.0, 0.0, datetime.now()))
         conn.commit()
         await ctx.send(message.author.name + "'s account registered!")
 

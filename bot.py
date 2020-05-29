@@ -29,7 +29,6 @@ bot = commands.Bot(command_prefix='!')
 @bot.event
 async def on_ready():
     print(f'{bot.user.name} has connected to Discord!')
-    print("Testing branch")
 
 @bot.command(name='helloworld', help="Really? Do you actually need a description for what this does?")
 async def helloworld(ctx):
@@ -62,7 +61,6 @@ async def leaderboard(ctx):
     c.execute('SELECT * FROM data')
     rank = []
     for row in c:
-        # print(row[2])
         rank.append([row[0], row[2]])
     rank = sorted(rank, key=lambda x: x[1], reverse=True)
     output = ""
@@ -79,10 +77,8 @@ async def pay(ctx, user , val : int):
     payer = str(ctx.author.id)
     c.execute('SELECT * FROM data WHERE name=? ', (payer,))
     payer_data = c.fetchone()
-    print(payer_data[1])
     if(val<=payer_data[1]):
         payee =  bot.get_user(int(str(user)[3:len(user)-1]))
-        print(payee.name)
         c.execute('SELECT * FROM data WHERE name=? ', (str(payee.id),))
         if c:
             payee_data = c.fetchone()

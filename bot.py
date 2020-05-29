@@ -74,16 +74,21 @@ async def leaderboard(ctx):
 # Needs to properly take IDs to not break on line 156
 @bot.command(name='pay', help='Pay another user some lembas')
 async def pay(ctx, user , val : int):
+    # c.execute("UPDATE data SET balance = ? WHERE name = ?", (1000.0, str(ctx.author.id)))
+
     payer = str(ctx.author.id)
-    c.execute('SELECT * FROM data WHERE name=? ', (payer,))
+    c.execute('SELECT * FROM data WHERE name=? ', (str(ctx.author.id),))
     payer_data = c.fetchone()
     if(val<=payer_data[1]):
         payee =  bot.get_user(int(str(user)[3:len(user)-1]))
-        c.execute('SELECT * FROM data WHERE name=? ', (str(payee.id),))
+        payee_name = str(int(str(user)[3:len(user)-1]))
+        c.execute('SELECT * FROM data WHERE name=? ', (payee_name,))
         if c:
             payee_data = c.fetchone()
-            c.execute("UPDATE data SET balance = ? WHERE name = ?", (payee_data[1] + val , str(payee.id)))
-            c.execute("UPDATE data SET balance = ? WHERE name = ?", (payer_data[1] - val, str(ctx.author.id)))
+            new_balance= payee_data[1] + val
+            old_balance = payer_data[1] - val
+            c.execute("UPDATE data SET balance = ? WHERE name = ?", (new_balance , (payee_name)))
+            c.execute("UPDATE data SET balance = ? WHERE name = ?", (old_balance, (str(ctx.author.id))))
             conn.commit()
             c.execute('SELECT * FROM data WHERE name=? ', (payer,))
             payer_data = c.fetchone()

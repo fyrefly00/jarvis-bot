@@ -119,6 +119,26 @@ async def vcheck(ctx, user):
         else:
             await ctx.channel.send("Vibe Check Failed. Vibes Removed")
 
+#Wishing Well
+@bot.command(name='wishingwell', help='Toss some lembas in to earn vibes. 5 Lembas = 1 Vibe')
+async def wishingwell(ctx, value):
+    payer = str(ctx.author.id)
+    c.execute('SELECT * FROM data WHERE name=? ', (payer,))
+    payer_data = c.fetchone()
+    # c.execute("UPDATE data SET balance = ? WHERE name = ?", (100.0, str(ctx.author.id)))
+
+    if int(value)  != 5:
+        await ctx.channel.send("Please pay only 5 lembas")
+        return
+    if(int(value) <= payer_data[2]):
+        winnings = float(int(random.choice(range(0, 3))))
+        c.execute("UPDATE data SET vibes = ? WHERE name = ?", (winnings + payer_data[2], str(ctx.author.id)))
+        c.execute("UPDATE data SET balance = ? WHERE name = ?", (payer_data[1] - 5, str(ctx.author.id)))
+        conn.commit
+        await ctx.channel.send("You recieved " + str(winnings) + " vibes!")
+    else:
+        await ctx.channel.send("Insuffecient Lembas!")
+      
 
 #Fun / Utils
 @bot.command(name='weather', help='Enter the name of a city in the form !weather <city>')

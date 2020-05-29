@@ -10,6 +10,7 @@ Completed Features:
 			-Vibe leaderboard
 		Lembas:
 			-Payment system
+			-Work system
 	Utilities:
 		Register (Should be deprecated soon)
 		Hello World

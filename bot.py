@@ -201,6 +201,9 @@ async def eightball(ctx, question):
     if(question.strip() != ""):
         await ctx.channel.send(RESPONSES[int(random.choice(range(0, len(RESPONSES))))])
 
+@bot.command(name='echo', help='Echo!')
+async def echo(ctx, message):
+    await ctx.channel.send(message)
 
 
 #Events

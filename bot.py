@@ -127,12 +127,12 @@ async def wishingwell(ctx, value):
     payer = str(ctx.author.id)
     c.execute('SELECT * FROM data WHERE name=? ', (payer,))
     payer_data = c.fetchone()
-    # c.execute("UPDATE data SET balance = ? WHERE name = ?", (100.0, str(ctx.author.id)))
+    # c.execute("UPDATE data SET balance = ? WHERE name = ?", (10.0, str(ctx.author.id)))
 
     if int(value)  != 5:
         await ctx.channel.send("Please pay only 5 lembas")
         return
-    if(int(value) <= payer_data[2]):
+    if(int(value) <= payer_data[1]):
         winnings = float(int(random.choice(range(0, 3))))
         c.execute("UPDATE data SET vibes = ? WHERE name = ?", (winnings + payer_data[2], str(ctx.author.id)))
         c.execute("UPDATE data SET balance = ? WHERE name = ?", (payer_data[1] - 5, str(ctx.author.id)))

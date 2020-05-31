@@ -95,6 +95,9 @@ async def pay(ctx, user , val : int):
             c.execute('SELECT * FROM data WHERE name=? ', (payer,))
             payer_data = c.fetchone()
             await ctx.send("Transfered " + str(val) + " lembas to " + payee.name)
+    else:
+        await ctx.send("You don't have enough lembas for that payment!")
+        
 
 #Vibe-checker: reuses active vibe-checker logic but with support for a specific user
 @bot.command(name='vcheck', help='Vibe check another user')
@@ -233,7 +236,7 @@ async def on_message(message):
         if c:
             result = c.fetchone()
             vibes = result[2]
-            lembas= result[1]
+            lembas= result[1]Here we go
             await message.channel.send("Vibe Check in Progress...")
             time.sleep(1)
             val = random.getrandbits(1)

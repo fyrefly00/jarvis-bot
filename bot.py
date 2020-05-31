@@ -81,11 +81,12 @@ async def pay(ctx, user , val : int):
     # c.execute("UPDATE data SET balance = ? WHERE name = ?", (1000.0, str(ctx.author.id)))
 
     payer = str(ctx.author.id)
-    c.execute('SELECT * FROM data WHERE name=? ', (payer,))
+    c.execute('SELECT * FROM data WHERE name=? ', (str(ctx.author.id),))
     payer_data = c.fetchone()
     if(val<=payer_data[1] and payer_data[1] > 0 and val >= 0):
         payee =  bot.get_user(int(str(user)[3:len(user)-1]))
-        c.execute('SELECT * FROM data WHERE name=? ', (str(payee.id),))
+        payee_name = str(int(str(user)[3:len(user)-1]))
+        c.execute('SELECT * FROM data WHERE name=? ', (payee_name,))
         if c:
             payee_data = c.fetchone()
             c.execute("UPDATE data SET balance = ? WHERE name = ?", (payee_data[1] + val, (str(payee.id))))
@@ -94,6 +95,9 @@ async def pay(ctx, user , val : int):
             c.execute('SELECT * FROM data WHERE name=? ', (payer,))
             payer_data = c.fetchone()
             await ctx.send("Transfered " + str(val) + " lembas to " + payee.name)
+    else:
+        await ctx.send("You don't have enough lembas for that payment!")
+        
 
 #Vibe-checker: reuses active vibe-checker logic but with support for a specific user
 @bot.command(name='vcheck', help='Vibe check another user')
@@ -136,7 +140,7 @@ async def wishingwell(ctx, value):
     if int(value)  != 5:
         await ctx.channel.send("Please pay only 5 lembas")
         return
-    if(int(value) <= payer_data[2]):
+    if(int(value) <= payer_data[1] and payer_data[1] > 0):
         winnings = float(int(random.choice(range(0, 3))))
         c.execute("UPDATE data SET vibes = ? WHERE name = ?", (winnings + payer_data[2], str(ctx.author.id)))
         c.execute("UPDATE data SET balance = ? WHERE name = ?", (payer_data[1] - 5, str(ctx.author.id)))
@@ -232,7 +236,7 @@ async def on_message(message):
         if c:
             result = c.fetchone()
             vibes = result[2]
-            lembas= result[1]
+            lembas= result[1]Here we go
             await message.channel.send("Vibe Check in Progress...")
             time.sleep(1)
             val = random.getrandbits(1)

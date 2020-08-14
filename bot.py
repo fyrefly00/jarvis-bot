@@ -12,7 +12,7 @@ from datetime import datetime
 from dateutil import parser
 
 #Weather API token
-TOKEN = "NzE0OTcwNzU2NjA1NTQyNDgx.Xs2egw.xjKqcAdP55okLQ7zm5nBGXMUzjY"
+TOKEN = ""
 
 
 #Load the database
